@@ -111,6 +111,26 @@ namespace RetroBar.Controls
         {
             SetStyles();
             SetTasksCollection();
+            UpdateResizeGrip();
+        }
+
+        // WorkWindowsBar: only advertise the Quick Launch resize grip while the taskbar is unlocked.
+        private void UpdateResizeGrip()
+        {
+            bool resizable = !Settings.Instance.LockTaskbar &&
+                             Settings.Instance.Edge != AppBarEdge.Left &&
+                             Settings.Instance.Edge != AppBarEdge.Right;
+
+            if (resizable)
+            {
+                QuickLaunchResizeThumb.Cursor = System.Windows.Input.Cursors.SizeWE;
+                QuickLaunchResizeThumb.ToolTip = "Arrastra para cambiar el ancho de Inicio rápido";
+            }
+            else
+            {
+                QuickLaunchResizeThumb.ClearValue(CursorProperty);
+                QuickLaunchResizeThumb.ClearValue(ToolTipProperty);
+            }
         }
 
         private void SetTasksCollection()
@@ -143,6 +163,11 @@ namespace RetroBar.Controls
 
         private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName is nameof(Settings.LockTaskbar) or nameof(Settings.Edge))
+            {
+                UpdateResizeGrip();
+            }
+
             if (e.PropertyName == nameof(Settings.MultiMonMode))
             {
                 taskbarItems?.Refresh();

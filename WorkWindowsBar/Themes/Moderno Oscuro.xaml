@@ -280,9 +280,14 @@
                                 Background="{StaticResource ModernStroke}" />
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
+                        <!-- Highlight only when the taskbar is unlocked (i.e. the grip can actually be dragged) -->
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource TemplatedParent}}" Value="True" />
+                                <Condition Binding="{Binding Path=IsLocked, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Value="False" />
+                            </MultiDataTrigger.Conditions>
                             <Setter TargetName="Line" Property="Background" Value="{StaticResource ModernAccent}" />
-                        </Trigger>
+                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

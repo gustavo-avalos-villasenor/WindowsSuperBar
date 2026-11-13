@@ -16,9 +16,8 @@
     </UserControl.Resources>
     <DockPanel>
         <Thumb Style="{DynamicResource ToolbarThumb}"
-               DragDelta="Thumb_DragDelta"
-               Cursor="SizeWE"
-               ToolTip="Arrastra para cambiar el ancho de Inicio rápido (barra desbloqueada)">
+               x:Name="QuickLaunchResizeThumb"
+               DragDelta="Thumb_DragDelta">
             <DockPanel.Dock>
                 <Binding Converter="{StaticResource dockOrientationConverter}"
                              ConverterParameter="leading"
