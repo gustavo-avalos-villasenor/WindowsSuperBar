@@ -1,0 +1,24 @@
+WorkWindowsBar
+Copyright 2026 WorkWindowsBar contributors
+
+This product is a modified version of RetroBar
+(https://github.com/dremin/RetroBar), Copyright 2026 Sam Johnson and
+community contributors, licensed under the Apache License, Version 2.0.
+RetroBar is built on ManagedShell (https://github.com/cairoshell/ManagedShell).
+
+"RetroBar" is the name of the original project. WorkWindowsBar is an
+independent fork and is not affiliated with or endorsed by the RetroBar
+authors.
+
+Main modifications made in WorkWindowsBar (see HANDOFF.md for details):
+- Product renamed to WorkWindowsBar (executable, window titles, texts,
+  settings folder %LOCALAPPDATA%\WorkWindowsBar, autostart entry, mutex).
+  Settings are migrated once from %LOCALAPPDATA%\RetroBar.
+- Task buttons: fixed-height rows that fill the taskbar height
+  (TaskRowHeight / MaxTaskRows), configurable width, optional multi-line titles.
+- Quick Launch: resizable width with icons laid out in rows; context menu
+  "Open Quick Launch folder"; default folder changed to the classic
+  Quick Launch folder.
+- Notification area: resizable width; icons spread evenly over the area.
+- New theme "Moderno Oscuro" (flat, dark), set as default.
+- Upstream update checks disabled; upstream installer/CI replaced.
