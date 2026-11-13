@@ -21,4 +21,6 @@ Main modifications made in WorkWindowsBar (see HANDOFF.md for details):
   Quick Launch folder.
 - Notification area: resizable width; icons spread evenly over the area.
 - New theme "Moderno Oscuro" (flat, dark), set as default.
+- Selectable start button icon (theme default, bundled "Cerdito", or user images).
+- Task buttons stay highlighted after an app requests attention until activated.
 - Upstream update checks disabled; upstream installer/CI replaced.

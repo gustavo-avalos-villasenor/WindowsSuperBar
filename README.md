@@ -47,6 +47,8 @@ Se guarda en `%LOCALAPPDATA%\WorkWindowsBar\settings.json`. Para editarla a mano
 | `MultiLineTaskButtons` | `true` | Activa el diseño de filas y botones altos |
 | `QuickLaunchWidth` | `0` | Ancho del Quick Launch (0 = automático) |
 | `TrayIconsWidth` | `0` | Ancho de la bandeja (0 = automático) |
+| `CustomStartIcon` | `""` | Icono del botón de Inicio: `""` = el del tema, `Cerdito` = el incluido, o la ruta a una imagen |
+| `CustomStartIconSize` | `52` | Tamaño (px) del icono de Inicio personalizado |
 | `QuickLaunchPath` | `%appdata%\Microsoft\Internet Explorer\Quick Launch` | Carpeta de accesos directos del Quick Launch |
 | `RowCount` | `2` | Altura de la barra, en filas de RetroBar |
 
@@ -59,6 +61,10 @@ dotnet publish WorkWindowsBar\WorkWindowsBar.csproj -c Release -f net10.0-window
 ```
 
 El ejecutable queda en `publish\WorkWindowsBar\WorkWindowsBar.exe`. Antes de sobrescribir una carpeta en uso, cierra la barra que esté corriendo.
+
+## Icono de Inicio
+
+En *Propiedades* → *Icono de Inicio* puedes elegir entre **Del tema** (el original de cada tema; en "Moderno Oscuro", los cuatro cuadros) y **Cerdito**. Para agregar los tuyos, pon un `.png` (idealmente cuadrado y con fondo transparente) en `%LOCALAPPDATA%\WorkWindowsBar\StartIcons` y aparecerá en la lista con su nombre.
 
 ## Temas
 

@@ -44,6 +44,97 @@ namespace RetroBar.Utilities
             {
                 SetTheme(Settings.Instance.Theme);
             }
+
+            ApplyCustomStartIcon();
+        }
+
+        // WorkWindowsBar: a key set directly on Application.Resources wins over the theme
+        // dictionaries (merged), so the custom image overrides any theme's StartIconImage.
+        private const string START_ICON_KEY = "StartIconImage";
+        private const string START_ICON_STYLE_KEY = "StartIcon";
+
+        // Start icons: "" = the theme's own icon; a bare name = a PNG in Resources\StartIcons (shipped
+        // with the app) or in %LOCALAPPDATA%\WorkWindowsBar\StartIcons (user-added); otherwise a full path.
+        public const string START_ICON_THEME = "";
+        private const string START_ICON_FOLDER = "StartIcons";
+        private const string START_ICON_EXT = "png";
+
+        private static string BuiltInStartIconDir =>
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", START_ICON_FOLDER);
+
+        public List<string> GetStartIcons()
+        {
+            var icons = new List<string>();
+            icons.AddFrom(BuiltInStartIconDir, START_ICON_EXT);
+            icons.AddFrom(START_ICON_FOLDER.InLocalAppData(), START_ICON_EXT, true);
+            return icons;
+        }
+
+        public static string ResolveStartIcon(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            string expanded = Environment.ExpandEnvironmentVariables(value);
+            if (Path.IsPathRooted(expanded))
+            {
+                return File.Exists(expanded) ? expanded : null;
+            }
+
+            foreach (string dir in new[] { BuiltInStartIconDir, START_ICON_FOLDER.InLocalAppData() })
+            {
+                string candidate = Path.Combine(dir, $"{expanded}.{START_ICON_EXT}");
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            return null;
+        }
+
+        private void ApplyCustomStartIcon()
+        {
+            var resources = Application.Current.Resources;
+            string path = ResolveStartIcon(Settings.Instance.CustomStartIcon);
+
+            // Drop any previous size override so the theme's StartIcon style is the base again.
+            resources.Remove(START_ICON_STYLE_KEY);
+
+            if (path != null)
+            {
+                try
+                {
+                    var image = new System.Windows.Media.Imaging.BitmapImage();
+                    image.BeginInit();
+                    image.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+                    image.UriSource = new Uri(path, UriKind.Absolute);
+                    image.EndInit();
+                    image.Freeze();
+                    resources[START_ICON_KEY] = image;
+
+                    double size = Settings.Instance.CustomStartIconSize;
+                    if (size > 0)
+                    {
+                        var style = new Style(typeof(System.Windows.Controls.Image),
+                                              Application.Current.TryFindResource(START_ICON_STYLE_KEY) as Style);
+                        style.Setters.Add(new Setter(FrameworkElement.WidthProperty, size));
+                        style.Setters.Add(new Setter(FrameworkElement.HeightProperty, size));
+                        style.Setters.Add(new Setter(System.Windows.Media.RenderOptions.BitmapScalingModeProperty,
+                                                     System.Windows.Media.BitmapScalingMode.HighQuality));
+                        resources[START_ICON_STYLE_KEY] = style;
+                    }
+                    return;
+                }
+                catch (Exception e)
+                {
+                    ManagedShell.Common.Logging.ShellLogger.Error($"DictionaryManager: Unable to load custom start icon: {e.Message}");
+                }
+            }
+
+            resources.Remove(START_ICON_KEY);
         }
 
         private void SetSystemThemeParams()
@@ -204,6 +295,10 @@ namespace RetroBar.Utilities
             if (e.PropertyName == nameof(Settings.Theme))
             {
                 SetThemeFromSettings();
+            }
+            else if (e.PropertyName is nameof(Settings.CustomStartIcon) or nameof(Settings.CustomStartIconSize))
+            {
+                ApplyCustomStartIcon();
             }
         }
 

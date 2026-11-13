@@ -213,6 +213,16 @@
                                 <ComboBox x:Name="cboThemeSelect"
                                           SelectedValue="{Binding Source={x:Static Settings:Settings.Instance}, Path=Theme, UpdateSourceTrigger=PropertyChanged}" />
                             </DockPanel>
+                            <!-- WorkWindowsBar: start button icon (theme's own, or a bundled/user image) -->
+                            <DockPanel>
+                                <Label VerticalAlignment="Center"
+                                       Target="{Binding ElementName=cboStartIconSelect}">
+                                    <AccessText Text="{DynamicResource start_icon_text}" />
+                                </Label>
+                                <ComboBox x:Name="cboStartIconSelect"
+                                          SelectedValuePath="Tag"
+                                          SelectedValue="{Binding Source={x:Static Settings:Settings.Instance}, Path=CustomStartIcon, UpdateSourceTrigger=PropertyChanged}" />
+                            </DockPanel>
                             <DockPanel>
                                 <Label VerticalAlignment="Center"
                                        Target="{Binding ElementName=cboEdgeSelect}">

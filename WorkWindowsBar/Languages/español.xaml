@@ -13,6 +13,8 @@
     <s:String x:Key="language_text">Idi_oma:</s:String>
     <s:String x:Key="language_tip">Seleccione el idioma a usar.</s:String>
     <s:String x:Key="theme_text">_Tema:</s:String>
+    <s:String x:Key="start_icon_text">_Icono de Inicio:</s:String>
+    <s:String x:Key="start_icon_theme">Del tema</s:String>
     <s:String x:Key="theme_tip">Instale temas en la carpeta Themes.</s:String>
     <s:String x:Key="location_text">_Ubicación:</s:String>
     <s:String x:Key="location_tip">Cambie la ubicación de la barra de tareas en pantalla.</s:String>

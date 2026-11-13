@@ -84,6 +84,7 @@ namespace RetroBar
             LoadOSSupport();
             LoadRows();
             LoadThemes();
+            LoadStartIcons();
             LoadWidth();
             LoadAppInfo();
             LoadClockActions();
@@ -203,6 +204,34 @@ namespace RetroBar
         private void LoadWidth()
         {
             sldTaskbarWidth.Maximum = Settings.Instance.TaskbarWidthLimit;
+        }
+
+        // WorkWindowsBar: "theme icon" + bundled/user start icons (+ the current custom path, if any).
+        private void LoadStartIcons()
+        {
+            cboStartIconSelect.Items.Add(new System.Windows.Controls.ComboBoxItem
+            {
+                Content = FindResource("start_icon_theme"),
+                Tag = DictionaryManager.START_ICON_THEME
+            });
+
+            foreach (string icon in _dictionaryManager.GetStartIcons())
+            {
+                cboStartIconSelect.Items.Add(new System.Windows.Controls.ComboBoxItem { Content = icon, Tag = icon });
+            }
+
+            string current = Settings.Instance.CustomStartIcon;
+            if (!string.IsNullOrEmpty(current) && !cboStartIconSelect.Items.OfType<System.Windows.Controls.ComboBoxItem>().Any(i => (string)i.Tag == current))
+            {
+                cboStartIconSelect.Items.Add(new System.Windows.Controls.ComboBoxItem
+                {
+                    Content = System.IO.Path.GetFileNameWithoutExtension(current),
+                    Tag = current
+                });
+            }
+
+            // SetCurrentValue keeps the two-way binding to the setting intact.
+            cboStartIconSelect.SetCurrentValue(System.Windows.Controls.Primitives.Selector.SelectedValueProperty, current);
         }
 
         private void LoadThemes()

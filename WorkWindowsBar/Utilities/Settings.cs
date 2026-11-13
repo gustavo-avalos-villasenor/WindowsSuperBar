@@ -450,6 +450,23 @@ namespace RetroBar.Utilities
             set => Set(ref _trayIconsWidth, Math.Max(0, value));
         }
 
+        // Start button icon. "" = the theme's icon; a name = a PNG from Resources\StartIcons or
+        // %LOCALAPPDATA%\WorkWindowsBar\StartIcons (e.g. "Cerdito"); or a full image path.
+        private string _customStartIcon = "";
+        public string CustomStartIcon
+        {
+            get => _customStartIcon;
+            set => Set(ref _customStartIcon, value ?? "");
+        }
+
+        // Display size (px, before scaling) of CustomStartIcon. 0 = keep the theme's icon size.
+        private double _customStartIconSize = 52;
+        public double CustomStartIconSize
+        {
+            get => _customStartIconSize;
+            set => Set(ref _customStartIconSize, Math.Clamp(value, 0, 200));
+        }
+
         // Preferred task button width in pixels (before scaling). 0 = use the theme's width.
         private double _taskButtonWidthOverride = 220;
         public double TaskButtonWidthOverride

@@ -134,6 +134,7 @@ namespace RetroBar.Controls
             {
                 Window.GetButtonRect += Window_GetButtonRect;
                 Window.PropertyChanged += Window_PropertyChanged;
+                UpdateAttentionState();
             }
 
             if (Settings.Instance.SlideTaskbarButtons && Host?.Host?.Orientation == Orientation.Horizontal)
@@ -165,6 +166,49 @@ namespace RetroBar.Controls
             if (e.PropertyName == "State")
             {
                 ScrollIntoView();
+
+                if (Dispatcher.CheckAccess())
+                {
+                    UpdateAttentionState();
+                }
+                else
+                {
+                    Dispatcher.BeginInvoke(new Action(UpdateAttentionState));
+                }
+            }
+        }
+
+        // WorkWindowsBar: like the native Windows taskbar, a button that asked for attention
+        // (FlashWindowEx) stays highlighted until the window is activated. ManagedShell alone
+        // toggles Flashing/Inactive with every blink and ends un-highlighted once the app stops
+        // flashing, so the notification was easy to miss.
+        private bool _needsAttention;
+
+        private void UpdateAttentionState()
+        {
+            if (Window == null)
+            {
+                return;
+            }
+
+            switch (Window.State)
+            {
+                case ApplicationWindow.WindowState.Flashing:
+                    _needsAttention = true;
+                    break;
+                case ApplicationWindow.WindowState.Active:
+                    _needsAttention = false;
+                    break;
+            }
+
+            if (_needsAttention && Window.State != ApplicationWindow.WindowState.Active)
+            {
+                // Pin the flashing style (replaces the state-driven binding until cleared).
+                AppButton.Style = FindResource("TaskButtonFlashing") as Style;
+            }
+            else if (BindingOperations.GetMultiBindingExpression(AppButton, StyleProperty) == null)
+            {
+                SetStyle();
             }
         }
 
@@ -330,6 +374,7 @@ namespace RetroBar.Controls
             {
                 SetStyle();
                 ApplyLabelLayout();
+                UpdateAttentionState();
             }
             else if (e.PropertyName is nameof(Settings.MultiLineTaskButtons)
                      or nameof(Settings.TaskLabelLines)
@@ -351,7 +396,20 @@ namespace RetroBar.Controls
 
         private void ContextMenu_OpenedOrClosed(object sender, RoutedEventArgs e)
         {
-            BindingOperations.GetMultiBindingExpression(AppButton, StyleProperty).UpdateTarget();
+            if (sender is ContextMenu menu && menu.IsOpen)
+            {
+                // Show as active while the menu is open (restores the state-driven binding).
+                if (BindingOperations.GetMultiBindingExpression(AppButton, StyleProperty) == null)
+                {
+                    SetStyle();
+                }
+                BindingOperations.GetMultiBindingExpression(AppButton, StyleProperty)?.UpdateTarget();
+            }
+            else
+            {
+                BindingOperations.GetMultiBindingExpression(AppButton, StyleProperty)?.UpdateTarget();
+                UpdateAttentionState();
+            }
         }
     }
 }
