@@ -192,7 +192,7 @@ namespace RetroBar.Utilities
             set => Set(ref _notifyIconOrder, value);
         }
 
-        private bool _allowFontSmoothing = false;
+        private bool _allowFontSmoothing = true; // WorkWindowsBar: smooth (ClearType) text by default
         public bool AllowFontSmoothing
         {
             get => _allowFontSmoothing;
