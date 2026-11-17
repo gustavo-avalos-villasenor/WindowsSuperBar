@@ -14,6 +14,8 @@
     <s:String x:Key="language_tip">Seleccione el idioma a usar.</s:String>
     <s:String x:Key="theme_text">_Tema:</s:String>
     <s:String x:Key="start_icon_text">_Icono de Inicio:</s:String>
+    <s:String x:Key="quick_close_tip">Cierre rápido: dos clics para cerrar todas las ventanas de la barra</s:String>
+    <s:String x:Key="quick_close_armed_tip">Clic otra vez para cerrar {0} ventanas (las que tengan cambios sin guardar preguntarán antes)</s:String>
     <s:String x:Key="start_icon_theme">Del tema</s:String>
     <s:String x:Key="theme_tip">Instale temas en la carpeta Themes.</s:String>
     <s:String x:Key="location_text">_Ubicación:</s:String>

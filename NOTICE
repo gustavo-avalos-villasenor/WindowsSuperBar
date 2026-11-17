@@ -23,4 +23,5 @@ Main modifications made in WorkWindowsBar (see HANDOFF.md for details):
 - New theme "Moderno Oscuro" (flat, dark), set as default.
 - Selectable start button icon (theme default, bundled "Cerdito", or user images).
 - Task buttons stay highlighted after an app requests attention until activated.
+- Quick close button (two clicks) that closes all taskbar windows in parallel.
 - Upstream update checks disabled; upstream installer/CI replaced.

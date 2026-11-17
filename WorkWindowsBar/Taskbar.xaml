@@ -88,6 +88,53 @@
                              RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
                 </DockPanel.Dock>
             </controls:ShowDesktopButton>
+            <!-- WorkWindowsBar: quick close - asks every window on the taskbar to close, all at once -->
+            <Button x:Name="QuickCloseButton"
+                    Click="QuickCloseButton_OnClick"
+                    Focusable="False"
+                    Width="34"
+                    Margin="2,6"
+                    ToolTip="{DynamicResource quick_close_tip}">
+                <DockPanel.Dock>
+                    <Binding Converter="{StaticResource dockOrientationConverter}"
+                             ConverterParameter="trailing"
+                             Path="Orientation"
+                             RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
+                </DockPanel.Dock>
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="5">
+                            <Viewbox Width="18" Height="18">
+                                <Canvas Width="16" Height="16">
+                                    <Rectangle x:Name="BackWin" Canvas.Left="4.5" Canvas.Top="1.5" Width="10" Height="10" RadiusX="1.5" RadiusY="1.5"
+                                               Stroke="{DynamicResource ButtonForeground}" StrokeThickness="1.2" />
+                                    <Rectangle x:Name="FrontWin" Canvas.Left="1.5" Canvas.Top="4.5" Width="10" Height="10" RadiusX="1.5" RadiusY="1.5"
+                                               Fill="{DynamicResource ButtonFace}" Stroke="{DynamicResource ButtonForeground}" StrokeThickness="1.2" />
+                                    <Path x:Name="Cross" Data="M4.5,7.5 L8.5,11.5 M8.5,7.5 L4.5,11.5"
+                                          Stroke="{DynamicResource ButtonForeground}" StrokeThickness="1.4"
+                                          StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ButtonHighlight}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource ButtonShadow}" />
+                            </Trigger>
+                            <!-- Armed by the first click: red until the second click or the timeout -->
+                            <Trigger Property="Tag" Value="armed">
+                                <Setter TargetName="Bd" Property="Background" Value="#C42B1C" />
+                                <Setter TargetName="BackWin" Property="Stroke" Value="White" />
+                                <Setter TargetName="FrontWin" Property="Stroke" Value="White" />
+                                <Setter TargetName="FrontWin" Property="Fill" Value="#C42B1C" />
+                                <Setter TargetName="Cross" Property="Stroke" Value="White" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
             <GroupBox Style="{DynamicResource Tray}">
                 <GroupBox.ContextMenu>
                     <ContextMenu>
@@ -146,7 +193,8 @@
                              RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" />
                 </DockPanel.Dock>
             </controls:InputLanguage>
-            <controls:TaskList VerticalAlignment="Stretch"
+            <controls:TaskList x:Name="MainTaskList"
+                               VerticalAlignment="Stretch"
                                Host="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}"
                                Tasks="{Binding Tasks}"></controls:TaskList>
         </DockPanel>

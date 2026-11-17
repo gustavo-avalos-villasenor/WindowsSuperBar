@@ -84,6 +84,23 @@ namespace RetroBar.Controls
             InitializeComponent();
         }
 
+        // WorkWindowsBar: the windows currently shown as buttons on this taskbar (same filter as the UI).
+        public System.Collections.Generic.List<ApplicationWindow> GetVisibleWindows()
+        {
+            var result = new System.Collections.Generic.List<ApplicationWindow>();
+            if (taskbarItems != null)
+            {
+                foreach (object item in taskbarItems)
+                {
+                    if (item is ApplicationWindow window)
+                    {
+                        result.Add(window);
+                    }
+                }
+            }
+            return result;
+        }
+
         private void SetStyles()
         {
             DefaultButtonWidth = Application.Current.FindResource("TaskButtonWidth") as double? ?? 0;

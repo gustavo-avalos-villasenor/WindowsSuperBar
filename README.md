@@ -13,6 +13,7 @@ Es un fork de [RetroBar](https://github.com/dremin/RetroBar) (Apache-2.0), que a
   - Para agregar un programa, arrástralo sobre la zona de iconos.
 - **Apps abiertas en varias filas.** Cada botón es ancho y muestra el icono y el título. La barra muestra tantas filas como quepan en su altura, hasta 3 por defecto.
 - **Bandeja de notificaciones redimensionable.** Los iconos se reparten de forma pareja en el espacio disponible.
+- **Cierre rápido** (botón junto al reloj): el primer clic lo pone en rojo; el segundo, dentro de 3 s, manda cerrar **a la vez** todas las ventanas de la barra, como darle a la X a cada una. Las que tengan cambios sin guardar te preguntan y se quedan abiertas.
 - **Tema "Moderno Oscuro"** (por defecto): plano, oscuro y con esquinas redondeadas. Los temas clásicos de RetroBar (Windows 95-98, XP, Vista…) siguen disponibles.
 - Todo lo de RetroBar: bandeja nativa, miniaturas, barra en cualquier borde, varios monitores, ocultar automáticamente y temas o idiomas personalizados.
 

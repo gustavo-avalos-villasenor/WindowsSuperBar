@@ -27,6 +27,65 @@ namespace RetroBar
         private double _unlockedMargin;
         public double DesiredRowHeight { get; private set; }
 
+        // WorkWindowsBar: quick close. Posts SC_CLOSE (same as clicking the window's X) to every
+        // window shown on this taskbar at once, without waiting on any of them, so the closes run in
+        // parallel. Windows with unsaved work show their own "save changes?" prompt and stay open.
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern bool PostMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        private const uint WM_SYSCOMMAND = 0x0112;
+        private static readonly IntPtr SC_CLOSE = new IntPtr(0xF060);
+
+        // Two-click safety: the first click arms the button (red) for a few seconds; a second click
+        // while armed closes everything. An accidental single click does nothing.
+        private System.Windows.Threading.DispatcherTimer _quickCloseArmTimer;
+        private static readonly TimeSpan QuickCloseArmTime = TimeSpan.FromSeconds(3);
+
+        private void QuickCloseButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            var windows = MainTaskList.GetVisibleWindows();
+
+            if (!IsQuickCloseArmed)
+            {
+                if (windows.Count > 0)
+                {
+                    ArmQuickClose(windows.Count);
+                }
+                return;
+            }
+
+            DisarmQuickClose();
+
+            foreach (var window in windows)
+            {
+                PostMessage(window.Handle, WM_SYSCOMMAND, SC_CLOSE, IntPtr.Zero);
+            }
+
+            ShellLogger.Info($"Taskbar: Quick close sent to {windows.Count} windows");
+        }
+
+        private bool IsQuickCloseArmed => "armed".Equals(QuickCloseButton.Tag);
+
+        private void ArmQuickClose(int count)
+        {
+            QuickCloseButton.Tag = "armed";
+            QuickCloseButton.ToolTip = string.Format((string)FindResource("quick_close_armed_tip"), count);
+
+            if (_quickCloseArmTimer == null)
+            {
+                _quickCloseArmTimer = new System.Windows.Threading.DispatcherTimer { Interval = QuickCloseArmTime };
+                _quickCloseArmTimer.Tick += (s, args) => DisarmQuickClose();
+            }
+            _quickCloseArmTimer.Stop();
+            _quickCloseArmTimer.Start();
+        }
+
+        private void DisarmQuickClose()
+        {
+            _quickCloseArmTimer?.Stop();
+            QuickCloseButton.Tag = null;
+            QuickCloseButton.SetResourceReference(ToolTipProperty, "quick_close_tip");
+        }
+
         // ToolBar fork: the grip sits to the left of the tray, so dragging left widens it.
         private void TrayResizeThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
         {
