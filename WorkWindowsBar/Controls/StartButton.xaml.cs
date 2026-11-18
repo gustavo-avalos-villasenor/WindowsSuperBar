@@ -2,6 +2,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -41,6 +42,8 @@ namespace RetroBar.Controls
         {
             InitializeComponent();
 
+            SpeechBubble.CustomPopupPlacementCallback = PlaceSpeechBubble;
+
             pendingOpenTimer = new DispatcherTimer(DispatcherPriority.Background);
             pendingOpenTimer.Interval = new TimeSpan(0, 0, 0, 1);
             pendingOpenTimer.Tick += (sender, args) =>
@@ -73,8 +76,56 @@ namespace RetroBar.Controls
             pendingOpenTimer.Stop();
         }
 
+        #region Speech bubble (WorkWindowsBar)
+
+        private bool BubbleAbove => Settings.Instance.Edge != ManagedShell.AppBar.AppBarEdge.Top;
+
+        // Centered over the button; below it (without tail) when the taskbar is at the top.
+        private CustomPopupPlacement[] PlaceSpeechBubble(Size popupSize, Size targetSize, Point offset)
+        {
+            double x = (targetSize.Width - popupSize.Width) / 2;
+            double y = BubbleAbove ? -popupSize.Height + 4 : targetSize.Height - 4;
+            return new[] { new CustomPopupPlacement(new Point(x, y), PopupPrimaryAxis.Horizontal) };
+        }
+
+        private void Start_OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            string text = Settings.Instance.StartIconHoverText;
+            bool enabled = !string.IsNullOrWhiteSpace(text);
+
+            // The bubble replaces the regular tooltip while it is enabled.
+            ToolTipService.SetIsEnabled(Start, !enabled);
+
+            if (!enabled || Start.IsChecked == true)
+            {
+                return;
+            }
+
+            SpeechBubbleText.Text = text;
+            SpeechBubbleTail.Visibility = BubbleAbove ? Visibility.Visible : Visibility.Collapsed;
+            SpeechBubbleRoot.RenderTransformOrigin = BubbleAbove ? new Point(0.5, 1) : new Point(0.5, 0);
+            SpeechBubble.IsOpen = true;
+
+            // Little "pop" in
+            var ease = new System.Windows.Media.Animation.BackEase { Amplitude = 0.4, EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut };
+            var grow = new System.Windows.Media.Animation.DoubleAnimation(0.5, 1, TimeSpan.FromMilliseconds(180)) { EasingFunction = ease };
+            var fade = new System.Windows.Media.Animation.DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(120));
+            SpeechBubbleScale.BeginAnimation(ScaleTransform.ScaleXProperty, grow);
+            SpeechBubbleScale.BeginAnimation(ScaleTransform.ScaleYProperty, grow);
+            SpeechBubbleRoot.BeginAnimation(OpacityProperty, fade);
+        }
+
+        private void Start_OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            SpeechBubble.IsOpen = false;
+        }
+
+        #endregion
+
         private void Start_OnClick(object sender, RoutedEventArgs e)
         {
+            SpeechBubble.IsOpen = false;
+
             if (allowOpenStart)
             {
                 OpenStartMenu();

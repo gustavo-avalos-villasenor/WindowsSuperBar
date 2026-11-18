@@ -3,23 +3,75 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Loaded="UserControl_Loaded"
              Unloaded="UserControl_Unloaded">
-    <ToggleButton ToolTip="{DynamicResource StartButtonTip}"
-                  Click="Start_OnClick"
-                  DragEnter="Start_DragEnter"
-                  DragLeave="Start_DragLeave"
-                  PreviewMouseLeftButtonDown="Start_OnPreviewMouseLeftButtonDown"
-                  MouseRightButtonUp="Start_OnMouseRightButtonUp"
-                  Name="Start"
-                  Style="{DynamicResource StartButton}">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Image Grid.Column="0"
-                   Style="{DynamicResource StartIcon}" />
-            <TextBlock Grid.Column="1"
-                       Style="{DynamicResource StartLabel}" />
-        </Grid>
-    </ToggleButton>
+    <Grid>
+        <ToggleButton ToolTip="{DynamicResource StartButtonTip}"
+                      Click="Start_OnClick"
+                      DragEnter="Start_DragEnter"
+                      DragLeave="Start_DragLeave"
+                      PreviewMouseLeftButtonDown="Start_OnPreviewMouseLeftButtonDown"
+                      MouseRightButtonUp="Start_OnMouseRightButtonUp"
+                      MouseEnter="Start_OnMouseEnter"
+                      MouseLeave="Start_OnMouseLeave"
+                      Name="Start"
+                      Style="{DynamicResource StartButton}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Image Grid.Column="0"
+                       Style="{DynamicResource StartIcon}" />
+                <TextBlock Grid.Column="1"
+                           Style="{DynamicResource StartLabel}" />
+            </Grid>
+        </ToggleButton>
+
+        <!-- WorkWindowsBar: comic speech bubble shown on hover (Settings.StartIconHoverText) -->
+        <Popup x:Name="SpeechBubble"
+               PlacementTarget="{Binding ElementName=Start}"
+               Placement="Custom"
+               AllowsTransparency="True"
+               IsHitTestVisible="False"
+               Focusable="False"
+               StaysOpen="True">
+            <Grid x:Name="SpeechBubbleRoot"
+                  Margin="6"
+                  RenderTransformOrigin="0.5,1">
+                <Grid.RenderTransform>
+                    <ScaleTransform x:Name="SpeechBubbleScale" ScaleX="1" ScaleY="1" />
+                </Grid.RenderTransform>
+                <Grid.Effect>
+                    <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.45" />
+                </Grid.Effect>
+                <StackPanel>
+                    <Border Background="White"
+                            BorderBrush="#2B2B2B"
+                            BorderThickness="2"
+                            CornerRadius="14"
+                            Padding="12,5,12,6">
+                        <TextBlock x:Name="SpeechBubbleText"
+                                   FontFamily="Comic Sans MS, Segoe Print, Segoe UI"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   Foreground="#2B2B2B"
+                                   TextOptions.TextRenderingMode="ClearType"
+                                   TextOptions.TextFormattingMode="Ideal" />
+                    </Border>
+                    <!-- Tail pointing down at the button. Open figure: only the two slanted sides are
+                         stroked, and its white fill overlaps the bubble's bottom border (Margin -3) so
+                         bubble and tail read as one shape. -->
+                    <Path x:Name="SpeechBubbleTail"
+                          HorizontalAlignment="Center"
+                          Margin="0,-3,0,0"
+                          Data="M0,0 L5,12 L15,0"
+                          Fill="White"
+                          Stroke="#2B2B2B"
+                          StrokeThickness="2"
+                          StrokeLineJoin="Round"
+                          StrokeStartLineCap="Flat"
+                          StrokeEndLineCap="Flat" />
+                </StackPanel>
+            </Grid>
+        </Popup>
+    </Grid>
 </UserControl>

@@ -14,7 +14,9 @@ Es un fork de [RetroBar](https://github.com/dremin/RetroBar) (Apache-2.0), que a
 - **Apps abiertas en varias filas.** Cada botón es ancho y muestra el icono y el título. La barra muestra tantas filas como quepan en su altura, hasta 3 por defecto.
 - **Bandeja de notificaciones redimensionable.** Los iconos se reparten de forma pareja en el espacio disponible.
 - **Cierre rápido** (botón junto al reloj): el primer clic lo pone en rojo; el segundo, dentro de 3 s, manda cerrar **a la vez** todas las ventanas de la barra, como darle a la X a cada una. Las que tengan cambios sin guardar te preguntan y se quedan abiertas.
-- **Tema "Moderno Oscuro"** (por defecto): plano, oscuro y con esquinas redondeadas. Los temas clásicos de RetroBar (Windows 95-98, XP, Vista…) siguen disponibles.
+- **Las notificaciones no se pierden.** Si una app pide atención (por ejemplo, Slack con un mensaje nuevo), su botón se queda naranja hasta que la abres, como en la barra de Windows.
+- **Icono de Inicio a elegir**, con un globito de diálogo opcional al pasar el mouse (ver más abajo).
+- **Tema "Moderno Oscuro"** (por defecto): plano, oscuro, con esquinas redondeadas y texto suavizado. Los temas clásicos de RetroBar (Windows 95-98, XP, Vista…) siguen disponibles.
 - Todo lo de RetroBar: bandeja nativa, miniaturas, barra en cualquier borde, varios monitores, ocultar automáticamente y temas o idiomas personalizados.
 
 ## Requisitos
@@ -48,8 +50,10 @@ Se guarda en `%LOCALAPPDATA%\WorkWindowsBar\settings.json`. Para editarla a mano
 | `MultiLineTaskButtons` | `true` | Activa el diseño de filas y botones altos |
 | `QuickLaunchWidth` | `0` | Ancho del Quick Launch (0 = automático) |
 | `TrayIconsWidth` | `0` | Ancho de la bandeja (0 = automático) |
-| `CustomStartIcon` | `""` | Icono del botón de Inicio: `""` = el del tema, `Cerdito` = el incluido, o la ruta a una imagen |
-| `CustomStartIconSize` | `52` | Tamaño (px) del icono de Inicio personalizado |
+| `CustomStartIcon` | `""` | Icono del botón de Inicio: `""` = el del tema, el nombre de uno incluido (`Cerdito`, `Cerdito con bandera`) o la ruta a una imagen |
+| `CustomStartIconSize` | `52` | Alto (px) del icono de Inicio personalizado; el ancho sigue la proporción de la imagen |
+| `StartIconHoverText` | `""` | Texto del globito de diálogo al pasar el mouse sobre Inicio (vacío = sin globito, se muestra el aviso normal) |
+| `AllowFontSmoothing` | `true` | Texto suavizado (ClearType). En `false` se ve pixelado, estilo Windows 95 |
 | `QuickLaunchPath` | `%appdata%\Microsoft\Internet Explorer\Quick Launch` | Carpeta de accesos directos del Quick Launch |
 | `RowCount` | `2` | Altura de la barra, en filas de RetroBar |
 
@@ -65,7 +69,11 @@ El ejecutable queda en `publish\WorkWindowsBar\WorkWindowsBar.exe`. Antes de sob
 
 ## Icono de Inicio
 
-En *Propiedades* → *Icono de Inicio* puedes elegir entre **Del tema** (el original de cada tema; en "Moderno Oscuro", los cuatro cuadros) y **Cerdito**. Para agregar los tuyos, pon un `.png` (idealmente cuadrado y con fondo transparente) en `%LOCALAPPDATA%\WorkWindowsBar\StartIcons` y aparecerá en la lista con su nombre.
+En *Propiedades* → *Icono de Inicio* puedes elegir entre **Del tema** (el original de cada tema; en "Moderno Oscuro", los cuatro cuadros), **Cerdito** y **Cerdito con bandera**.
+
+- Para agregar los tuyos, pon un `.png` con fondo transparente en `%LOCALAPPDATA%\WorkWindowsBar\StartIcons` y aparecerá en la lista con su nombre.
+- El icono se ajusta por alto (`CustomStartIconSize`) y conserva su proporción, así que también sirven imágenes anchas.
+- **Globito de diálogo:** si pones un texto en `StartIconHoverText` (por ejemplo `Miawww!`), al pasar el mouse por Inicio aparece un globo de cómic con ese texto.
 
 ## Temas
 

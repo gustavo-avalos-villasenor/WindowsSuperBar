@@ -459,7 +459,17 @@ namespace RetroBar.Utilities
             set => Set(ref _customStartIcon, value ?? "");
         }
 
-        // Display size (px, before scaling) of CustomStartIcon. 0 = keep the theme's icon size.
+        // Text of a comic speech bubble shown over the start button on hover. Empty = no bubble
+        // (the regular tooltip is shown instead).
+        private string _startIconHoverText = "";
+        public string StartIconHoverText
+        {
+            get => _startIconHoverText;
+            set => Set(ref _startIconHoverText, value ?? "");
+        }
+
+        // Display height (px, before scaling) of CustomStartIcon; width follows the image's aspect
+        // ratio. 0 = keep the theme's icon size.
         private double _customStartIconSize = 52;
         public double CustomStartIconSize
         {

@@ -2,6 +2,21 @@
 
 Notas técnicas para quien continúe el proyecto.
 
+## Estado actual (2026-11-18)
+
+- **Funciona y está en uso diario** en Windows 11 (build Insider 26300, 2 monitores, barra abajo, tema "Moderno Oscuro").
+- **Repo:** rama `main`. Historial: renombre inicial → grips bloqueados → notificaciones persistentes + icono de Inicio → suavizado de fuentes → cierre rápido → globito "Miawww!" + "Cerdito con bandera".
+- **Todas las funciones de la tabla de abajo están terminadas.** No hay trabajo a medias.
+- **Probado a mano por el usuario:** cierre rápido (dos clics), notificaciones, selector de icono, texto suavizado.
+- **Sin confirmar todavía:** que el globito aparezca al pasar el mouse. Su dibujo sí se validó renderizándolo aparte.
+
+### Cómo retomar
+
+1. Lee la tabla **Cambios respecto a RetroBar**: cada fila dice qué archivos tocar para cada función.
+2. Compila y publica (sección **Compilar y probar**), cierra la barra que esté corriendo y lanza la nueva.
+3. Para probar, toma capturas de la barra. **Ojo:** el mouse y los clics simulados (`SetCursorPos`/`mouse_event`) no llegan a la barra, así que hover, clics y menús los tiene que probar una persona. Para ver ventanas semitransparentes (popups) en una captura hace falta `BitBlt` con `CAPTUREBLT`.
+4. Si más de una persona o agente trabaja en el repo, haz commit de tus cambios antes de que otro siga, para no pisarse.
+
 ## Qué es
 
 WorkWindowsBar es un fork de **RetroBar v1.22.122** (C#/WPF, .NET 10 y .NET 6) que reemplaza la barra de tareas de Windows. Se basa en el enfoque de RetroBar porque ya resolvía lo difícil: AppBar, bandeja nativa, lista de ventanas, Quick Launch e inicio. El trabajo del fork se concentra en el diseño y la usabilidad para trabajar con muchas ventanas.
@@ -36,7 +51,9 @@ NOTICE                          atribución + lista de cambios (requerido por Ap
 | Bandeja | `Taskbar.xaml(.cs)` (`TrayResizeThumb`), `Controls/NotifyIconList.xaml(.cs)`, `Controls/SpreadWrapPanel.cs` | Con `TrayIconsWidth > 0` los iconos se reparten por toda el área. Si no caben, se usa el wrap normal. |
 | Tema | `Themes/Moderno Oscuro.xaml` | Plano y oscuro, botón de inicio solo con icono y sin indicador bajo las apps. Es el tema por defecto en `Settings.cs`. |
 | Notificaciones | `Controls/TaskButton.xaml.cs` (`UpdateAttentionState`) | Un botón que pidió atención (FlashWindowEx) queda fijo en `TaskButtonFlashing` hasta que la ventana pasa a Active. ManagedShell solo alterna Flashing/Inactive con cada parpadeo y terminaba apagado. |
-| Icono de Inicio | `Utilities/DictionaryManager.cs` (`ApplyCustomStartIcon`, `GetStartIcons`, `ResolveStartIcon`), `Resources/StartIcons/*.png`, `PropertiesWindow.xaml(.cs)` (`cboStartIconSelect`), `Settings.CustomStartIcon/CustomStartIconSize` | Pone `StartIconImage` y un estilo `StartIcon` (tamaño, escalado HighQuality) directo en `Application.Resources`, que gana sobre el tema. `""` = icono del tema. Iconos de usuario en `%LOCALAPPDATA%\WorkWindowsBar\StartIcons`. |
+| Icono de Inicio | `Utilities/DictionaryManager.cs` (`ApplyCustomStartIcon`, `GetStartIcons`, `ResolveStartIcon`), `Resources/StartIcons/*.png` (`Cerdito`, `Cerdito con bandera`), `PropertiesWindow.xaml(.cs)` (`cboStartIconSelect`), `Settings.CustomStartIcon/CustomStartIconSize` | Pone `StartIconImage` y un estilo `StartIcon` (Height = `CustomStartIconSize`, Width automático para respetar la proporción, escalado HighQuality) directo en `Application.Resources`, que gana sobre el tema. `""` = icono del tema. Iconos de usuario en `%LOCALAPPDATA%\WorkWindowsBar\StartIcons`. Los PNG incluidos están recortados a su contenido, a 256 px de alto y con fondo transparente. |
+| Globito de Inicio | `Controls/StartButton.xaml(.cs)` (`SpeechBubble` Popup, `PlaceSpeechBubble`, `Start_OnMouseEnter/Leave`), `Settings.StartIconHoverText` | Popup con `AllowsTransparency`, centrado sobre el botón (debajo y sin colita si la barra está arriba), con animación de escala y opacidad al aparecer. Mientras hay texto, desactiva el ToolTip normal del botón. Se cierra al salir el mouse o al hacer clic. |
+| Texto | `Settings.AllowFontSmoothing` (por defecto `true`) | RetroBar lo trae en `false` (texto *aliased*, look retro), que con el tema moderno se veía pixelado. |
 | Cierre rápido | `Taskbar.xaml` (`QuickCloseButton`), `Taskbar.xaml.cs` (`QuickCloseButton_OnClick`, arm/disarm), `Controls/TaskList.xaml.cs` (`GetVisibleWindows`) | Dos clics (el primero "arma" el botón 3 s, en rojo vía `Tag="armed"`). Envía `WM_SYSCOMMAND/SC_CLOSE` con `PostMessage` a todas las ventanas visibles de la barra a la vez. No usa `ApplicationWindow.Close()` de ManagedShell porque es secuencial (trae cada ventana al frente + `SendMessageTimeout` de 200 ms). |
 | Updates | `Utilities/Updater.cs` | Desactivado (`UpdateFeedAvailable = false`), porque el feed de upstream ofrecería instalar RetroBar encima. |
 | Build | `Directory.Build.props` | Se quitó Nerdbank.GitVersioning (requería repo git al compilar). La versión está fija en `<Version>`. |
@@ -63,6 +80,9 @@ dotnet publish WorkWindowsBar\WorkWindowsBar.csproj -c Release -f net10.0-window
 - `TrayIconsWidth`/`QuickLaunchWidth` solo están pensados para la barra horizontal (abajo o arriba). En los bordes izquierdo y derecho no se probaron.
 - Icono propio (hoy usa `Resources/retrobar.ico` de upstream).
 - Opcional: un color de acento configurable en "Moderno Oscuro" (hoy es `#4CC2FF` fijo).
+- Exponer `StartIconHoverText` y `CustomStartIconSize` en *Propiedades*; hoy solo están en el JSON.
+- Ideas que salieron con el usuario y no se hicieron: "Apagar seguro" (cerrar todo y apagar al quedar vacío), "cerrar todas las ventanas de esta app" desde el clic derecho de un botón.
+- El icono "Cerdito con bandera" lleva el logo de Windows (marca de Microsoft). En un repo privado no importa; si el repo se hace público, conviene cambiarlo.
 
 ## Traer cambios de upstream
 

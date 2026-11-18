@@ -21,7 +21,9 @@ Main modifications made in WorkWindowsBar (see HANDOFF.md for details):
   Quick Launch folder.
 - Notification area: resizable width; icons spread evenly over the area.
 - New theme "Moderno Oscuro" (flat, dark), set as default.
-- Selectable start button icon (theme default, bundled "Cerdito", or user images).
+- Selectable start button icon (theme default, bundled "Cerdito" images, or user
+  images; aspect-ratio aware) and optional comic speech bubble on hover.
+- Font smoothing enabled by default.
 - Task buttons stay highlighted after an app requests attention until activated.
 - Quick close button (two clicks) that closes all taskbar windows in parallel.
 - Upstream update checks disabled; upstream installer/CI replaced.

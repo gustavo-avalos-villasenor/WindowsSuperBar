@@ -120,7 +120,8 @@ namespace RetroBar.Utilities
                     {
                         var style = new Style(typeof(System.Windows.Controls.Image),
                                               Application.Current.TryFindResource(START_ICON_STYLE_KEY) as Style);
-                        style.Setters.Add(new Setter(FrameworkElement.WidthProperty, size));
+                        // Fixed height, automatic width: wide images (e.g. with a flag) keep their proportions.
+                        style.Setters.Add(new Setter(FrameworkElement.WidthProperty, double.NaN));
                         style.Setters.Add(new Setter(FrameworkElement.HeightProperty, size));
                         style.Setters.Add(new Setter(System.Windows.Media.RenderOptions.BitmapScalingModeProperty,
                                                      System.Windows.Media.BitmapScalingMode.HighQuality));
