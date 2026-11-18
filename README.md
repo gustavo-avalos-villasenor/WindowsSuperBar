@@ -73,7 +73,7 @@ En *Propiedades* → *Icono de Inicio* puedes elegir entre **Del tema** (el orig
 
 - Para agregar los tuyos, pon un `.png` con fondo transparente en `%LOCALAPPDATA%\WorkWindowsBar\StartIcons` y aparecerá en la lista con su nombre.
 - El icono se ajusta por alto (`CustomStartIconSize`) y conserva su proporción, así que también sirven imágenes anchas.
-- **Globito de diálogo:** si pones un texto en `StartIconHoverText` (por ejemplo `Miawww!`), al pasar el mouse por Inicio aparece un globo de cómic con ese texto.
+- **Globito de diálogo:** si pones un texto en `StartIconHoverText` (por ejemplo `Miau!`), al pasar el mouse por Inicio aparece un globo de cómic con ese texto.
 
 ## Temas
 
