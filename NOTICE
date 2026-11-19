@@ -25,5 +25,7 @@ Main modifications made in WorkWindowsBar (see HANDOFF.md for details):
   images; aspect-ratio aware) and optional comic speech bubble on hover.
 - Font smoothing enabled by default.
 - Task buttons stay highlighted after an app requests attention until activated.
+- Animated start icon layers, hover speech bubble, quick-close button,
+  font smoothing on by default.
 - Quick close button (two clicks) that closes all taskbar windows in parallel.
 - Upstream update checks disabled; upstream installer/CI replaced.

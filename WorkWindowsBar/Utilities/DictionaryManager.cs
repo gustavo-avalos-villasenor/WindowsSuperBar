@@ -67,7 +67,73 @@ namespace RetroBar.Utilities
             var icons = new List<string>();
             icons.AddFrom(BuiltInStartIconDir, START_ICON_EXT);
             icons.AddFrom(START_ICON_FOLDER.InLocalAppData(), START_ICON_EXT, true);
+            // "<name>.base.png" / "<name>.wave.png" are animation layers of "<name>.png", not icons.
+            icons.RemoveAll(i => i.EndsWith(".base", StringComparison.OrdinalIgnoreCase) ||
+                                 i.EndsWith(".wave", StringComparison.OrdinalIgnoreCase) ||
+                                 i.EndsWith(".arm", StringComparison.OrdinalIgnoreCase));
             return icons;
+        }
+
+        private const string START_ICON_WAVE_KEY = "StartIconWaveImage";
+        private const string START_ICON_WAVE_ORIGIN_KEY = "StartIconWaveOrigin";
+        private const string START_ICON_ARM_KEY = "StartIconArmImage";
+        private const string START_ICON_ARM_ORIGIN_KEY = "StartIconArmOrigin";
+
+        // Left-most visible pixel of the arm layer (its shoulder), as a 0..1 RenderTransformOrigin.
+        private static Point GetArmOrigin(System.Windows.Media.Imaging.BitmapSource arm)
+        {
+            var converted = new System.Windows.Media.Imaging.FormatConvertedBitmap(arm, System.Windows.Media.PixelFormats.Bgra32, null, 0);
+            int w = converted.PixelWidth, h = converted.PixelHeight, stride = w * 4;
+            byte[] px = new byte[stride * h];
+            converted.CopyPixels(px, stride, 0);
+            for (int x = 0; x < w; x++)
+            {
+                int sumY = 0, count = 0;
+                for (int y = 0; y < h; y++)
+                {
+                    if (px[y * stride + x * 4 + 3] > 32) { sumY += y; count++; }
+                }
+                if (count > 0)
+                {
+                    return new Point((double)x / w, (double)sumY / count / h);
+                }
+            }
+            return new Point(0.5, 0.5);
+        }
+
+        private static System.Windows.Media.Imaging.BitmapImage LoadImage(string path)
+        {
+            var image = new System.Windows.Media.Imaging.BitmapImage();
+            image.BeginInit();
+            image.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
+            image.UriSource = new Uri(path, UriKind.Absolute);
+            image.EndInit();
+            image.Freeze();
+            return image;
+        }
+
+        // Left-middle of the wave layer's visible pixels, as a 0..1 RenderTransformOrigin, so the
+        // cloth flutters around the point where it is attached to the pole.
+        private static Point GetWaveOrigin(System.Windows.Media.Imaging.BitmapSource wave)
+        {
+            var converted = new System.Windows.Media.Imaging.FormatConvertedBitmap(wave, System.Windows.Media.PixelFormats.Bgra32, null, 0);
+            int w = converted.PixelWidth, h = converted.PixelHeight, stride = w * 4;
+            byte[] px = new byte[stride * h];
+            converted.CopyPixels(px, stride, 0);
+            int minX = w, minY = h, maxY = -1;
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    if (px[y * stride + x * 4 + 3] > 32)
+                    {
+                        if (x < minX) minX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                    }
+                }
+            }
+            return maxY < 0 ? new Point(0.5, 0.5) : new Point((double)minX / w, (minY + maxY) / 2.0 / h);
         }
 
         public static string ResolveStartIcon(string value)
@@ -102,18 +168,41 @@ namespace RetroBar.Utilities
 
             // Drop any previous size override so the theme's StartIcon style is the base again.
             resources.Remove(START_ICON_STYLE_KEY);
+            resources.Remove(START_ICON_WAVE_KEY);
+            resources.Remove(START_ICON_WAVE_ORIGIN_KEY);
+            resources.Remove(START_ICON_ARM_KEY);
+            resources.Remove(START_ICON_ARM_ORIGIN_KEY);
 
             if (path != null)
             {
                 try
                 {
-                    var image = new System.Windows.Media.Imaging.BitmapImage();
-                    image.BeginInit();
-                    image.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad;
-                    image.UriSource = new Uri(path, UriKind.Absolute);
-                    image.EndInit();
-                    image.Freeze();
-                    resources[START_ICON_KEY] = image;
+                    // Optional animation layers next to the icon: "<name>.base.png" (icon without the
+                    // moving part) + "<name>.wave.png" (only the moving part, same canvas size).
+                    string dir = Path.GetDirectoryName(path);
+                    string name = Path.GetFileNameWithoutExtension(path);
+                    string basePath = Path.Combine(dir, name + ".base.png");
+                    string wavePath = Path.Combine(dir, name + ".wave.png");
+                    bool hasWave = File.Exists(basePath) && File.Exists(wavePath);
+
+                    resources[START_ICON_KEY] = LoadImage(hasWave ? basePath : path);
+
+                    if (hasWave)
+                    {
+                        var wave = LoadImage(wavePath);
+                        resources[START_ICON_WAVE_KEY] = wave;
+                        resources[START_ICON_WAVE_ORIGIN_KEY] = GetWaveOrigin(wave);
+
+                        // Optional "<name>.arm.png": the part that swings from its shoulder (left-most
+                        // point), carrying the wave layer with it.
+                        string armPath = Path.Combine(dir, name + ".arm.png");
+                        if (File.Exists(armPath))
+                        {
+                            var arm = LoadImage(armPath);
+                            resources[START_ICON_ARM_KEY] = arm;
+                            resources[START_ICON_ARM_ORIGIN_KEY] = GetArmOrigin(arm);
+                        }
+                    }
 
                     double size = Settings.Instance.CustomStartIconSize;
                     if (size > 0)

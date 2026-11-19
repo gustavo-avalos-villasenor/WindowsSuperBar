@@ -74,6 +74,11 @@ En *Propiedades* → *Icono de Inicio* puedes elegir entre **Del tema** (el orig
 - Para agregar los tuyos, pon un `.png` con fondo transparente en `%LOCALAPPDATA%\WorkWindowsBar\StartIcons` y aparecerá en la lista con su nombre.
 - El icono se ajusta por alto (`CustomStartIconSize`) y conserva su proporción, así que también sirven imágenes anchas.
 - **Globito de diálogo:** si pones un texto en `StartIconHoverText` (por ejemplo `Miau!`), al pasar el mouse por Inicio aparece un globo de cómic con ese texto.
+- **Animación al pasar el mouse:** "Cerdito con bandera" mueve la patita y ondea la bandera. Para animar tus propios iconos, pon junto a `<nombre>.png` estas capas del mismo tamaño:
+  - `<nombre>.base.png`: el dibujo sin las partes que se mueven.
+  - `<nombre>.wave.png`: lo que ondea (por ejemplo una bandera); se mueve desde su borde izquierdo.
+  - `<nombre>.arm.png` (opcional): lo que gira (por ejemplo un brazo con el palo), desde su punto más a la izquierda; lleva consigo la capa `.wave`.
+- La imagen original del cerdito con bandera está en `art/`.
 
 ## Temas
 

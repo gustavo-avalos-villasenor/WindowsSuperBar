@@ -21,6 +21,30 @@
                 </Grid.ColumnDefinitions>
                 <Image Grid.Column="0"
                        Style="{DynamicResource StartIcon}" />
+                <!-- WorkWindowsBar: optional animated layers over the icon. The group (arm + flag)
+                     swings from the shoulder; inside it the flag cloth flutters on its own. All layers
+                     share the icon's style/size so they line up with the base image. -->
+                <Grid x:Name="StartIconArmGroup"
+                      Grid.Column="0"
+                      RenderTransformOrigin="{DynamicResource StartIconArmOrigin}">
+                    <Grid.RenderTransform>
+                        <RotateTransform x:Name="StartIconArmRotate" />
+                    </Grid.RenderTransform>
+                    <Image x:Name="StartIconArm"
+                           Style="{DynamicResource StartIcon}"
+                           Source="{DynamicResource StartIconArmImage}" />
+                    <Image x:Name="StartIconWave"
+                           Style="{DynamicResource StartIcon}"
+                           Source="{DynamicResource StartIconWaveImage}"
+                           RenderTransformOrigin="{DynamicResource StartIconWaveOrigin}">
+                        <Image.RenderTransform>
+                            <TransformGroup>
+                                <SkewTransform x:Name="StartIconWaveSkew" />
+                                <ScaleTransform x:Name="StartIconWaveScale" />
+                            </TransformGroup>
+                        </Image.RenderTransform>
+                    </Image>
+                </Grid>
                 <TextBlock Grid.Column="1"
                            Style="{DynamicResource StartLabel}" />
             </Grid>

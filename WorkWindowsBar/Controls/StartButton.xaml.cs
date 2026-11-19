@@ -88,8 +88,74 @@ namespace RetroBar.Controls
             return new[] { new CustomPopupPlacement(new Point(x, y), PopupPrimaryAxis.Horizontal) };
         }
 
+        // Flag flutter: the wave layer skews up/down around its pole attachment with a slight
+        // horizontal squeeze, looping while hovered.
+        private void StartWave()
+        {
+            if (StartIconWave.Source == null)
+            {
+                return;
+            }
+
+            var skew = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames
+            {
+                Duration = TimeSpan.FromMilliseconds(1100),
+                RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever
+            };
+            double[] angles = { 0, -9, 6, -6, 4, 0 };
+            for (int i = 0; i < angles.Length; i++)
+            {
+                skew.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(
+                    angles[i],
+                    System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(1100.0 * i / (angles.Length - 1))),
+                    new System.Windows.Media.Animation.SineEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }));
+            }
+
+            var squeeze = new System.Windows.Media.Animation.DoubleAnimation(1, 0.92, TimeSpan.FromMilliseconds(275))
+            {
+                AutoReverse = true,
+                RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
+                EasingFunction = new System.Windows.Media.Animation.SineEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }
+            };
+
+            StartIconWaveSkew.BeginAnimation(SkewTransform.AngleYProperty, skew);
+            StartIconWaveScale.BeginAnimation(ScaleTransform.ScaleXProperty, squeeze);
+
+            // Arm: waves the flag from the shoulder (negative = raises it), slower than the cloth.
+            if (StartIconArm.Source != null)
+            {
+                var swing = new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames
+                {
+                    Duration = TimeSpan.FromMilliseconds(1400),
+                    RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever
+                };
+                double[] arm = { 0, -7, 2, -5, 1, 0 };
+                for (int i = 0; i < arm.Length; i++)
+                {
+                    swing.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(
+                        arm[i],
+                        System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(1400.0 * i / (arm.Length - 1))),
+                        new System.Windows.Media.Animation.SineEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseInOut }));
+                }
+                StartIconArmRotate.BeginAnimation(RotateTransform.AngleProperty, swing);
+            }
+        }
+
+        private void StopWave()
+        {
+            // Settle back smoothly from wherever the flag is.
+            var settle = new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(250));
+            var unsqueeze = new System.Windows.Media.Animation.DoubleAnimation(1, TimeSpan.FromMilliseconds(250));
+            StartIconWaveSkew.BeginAnimation(SkewTransform.AngleYProperty, settle);
+            StartIconWaveScale.BeginAnimation(ScaleTransform.ScaleXProperty, unsqueeze);
+            StartIconArmRotate.BeginAnimation(RotateTransform.AngleProperty,
+                new System.Windows.Media.Animation.DoubleAnimation(0, TimeSpan.FromMilliseconds(250)));
+        }
+
         private void Start_OnMouseEnter(object sender, MouseEventArgs e)
         {
+            StartWave();
+
             string text = Settings.Instance.StartIconHoverText;
             bool enabled = !string.IsNullOrWhiteSpace(text);
 
@@ -118,6 +184,7 @@ namespace RetroBar.Controls
         private void Start_OnMouseLeave(object sender, MouseEventArgs e)
         {
             SpeechBubble.IsOpen = false;
+            StopWave();
         }
 
         #endregion
